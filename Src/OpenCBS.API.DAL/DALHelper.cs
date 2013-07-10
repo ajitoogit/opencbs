@@ -13,7 +13,7 @@ namespace OpenCBS.API.DAL
         {
             using (var stream = Assembly
                 .GetExecutingAssembly()
-                .GetManifestResourceStream("OpenCBS.API.DAL.Queries" + queryPath))
+                .GetManifestResourceStream("OpenCBS.API.DAL.Queries." + queryPath))
             using (var reader = new StreamReader(stream))
             {
                 return reader.ReadToEnd();
