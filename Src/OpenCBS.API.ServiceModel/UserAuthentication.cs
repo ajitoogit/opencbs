@@ -21,7 +21,7 @@ namespace OpenCBS.API.ServiceModel
         public string FirstName { get;set;}
         public string LastName { get; set; }
         public int RoleId { get; set; }
-
+        public string SessionId { get; set; }
         public ResponseStatus Status;
     }
 }
