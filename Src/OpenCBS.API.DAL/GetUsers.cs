@@ -21,10 +21,15 @@ namespace OpenCBS.API.DAL
             using (var db = dbFactory.OpenDbConnection())
             {
                 string query = DALHelper.ReadQuery("User.GetUserByCredentials.sql");
-                var user = db.Query<User>(query, new { Username = username,Password = password }).First();
+                var user = db.Query<User>(query, new { Username = username,Password = password }).FirstOrDefault();
                 return user;
             }
 
+        }
+
+        public static List<string> GetPermissionsByRoleId(int roleId)
+        {
+            return new List<string> {"TestService"};
         }
     }
 }

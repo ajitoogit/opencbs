@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ServiceStack.ServiceInterface.ServiceModel;
+﻿using ServiceStack.ServiceInterface.ServiceModel;
 using ServiceStack.ServiceHost;
 namespace OpenCBS.API.ServiceModel
 {
@@ -21,7 +17,6 @@ namespace OpenCBS.API.ServiceModel
         public string FirstName { get;set;}
         public string LastName { get; set; }
         public int RoleId { get; set; }
-        public string SessionId { get; set; }
         public ResponseStatus Status;
     }
 }
