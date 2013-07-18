@@ -11,7 +11,7 @@ using ServiceStack.Common.Extensions;
 namespace OpenCBS.API.DAL
 {
 
-    public class GetUsers
+    public class UserManager
     {
         
         public static User GetUserByCredentials(string username, string password)

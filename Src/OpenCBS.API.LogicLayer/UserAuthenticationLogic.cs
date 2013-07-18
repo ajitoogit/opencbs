@@ -14,7 +14,7 @@ namespace OpenCBS.API.LogicLayer
     {
         public static UserAuthenticationResponse Authenticate(Auth request, IAuthSession session, IServiceBase authService)
         {
-            var user = GetUsers.GetUserByCredentials(request.UserName, request.Password);
+            var user = UserManager.GetUserByCredentials(request.UserName, request.Password);
             // --- Check for errors
             if (user == null)
             {
@@ -50,7 +50,7 @@ namespace OpenCBS.API.LogicLayer
                 session.FirstName = user.FirstName;
                 session.UserAuthId = user.Id.ToString();
                 session.UserName = user.Username;
-                session.Permissions = GetUsers.GetPermissionsByRoleId(user.RoleId);
+                session.Permissions = UserManager.GetPermissionsByRoleId(user.RoleId);
                 session.Roles = new List<string> {user.RoleId.ToString()};
                 session.IsAuthenticated = true;
 

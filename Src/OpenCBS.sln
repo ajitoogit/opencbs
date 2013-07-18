@@ -46,7 +46,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{85D5D928-F280-4A10-B89E-041423BA4C98}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
@@ -331,7 +330,7 @@ Global
 		{87B35300-5551-4DC1-9355-38B0B47A894A} = {A7243FAC-712F-46A2-82A4-4BF35F03A5A7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		GreenPepperConfigXmlRpcHandler = greenpepper1
 		GreenPepperConfigServerUrl = http://wiki.octopusnetwork.org
+		GreenPepperConfigXmlRpcHandler = greenpepper1
 	EndGlobalSection
 EndGlobal

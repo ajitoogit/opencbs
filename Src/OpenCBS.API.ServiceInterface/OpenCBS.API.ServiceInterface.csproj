@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="MyAuthenticateAttribute.cs" />
     <Compile Include="MyRequiredPermissionAttribute.cs" />
+    <Compile Include="RoleService.cs" />
     <Compile Include="TestService.cs" />
     <Compile Include="UserAuthenticationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
