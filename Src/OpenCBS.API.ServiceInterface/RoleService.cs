@@ -10,10 +10,30 @@ namespace OpenCBS.API.ServiceInterface
 {
     class RoleService: Service
     {
+        // --- Get
         public object Any(RoleRequest request)
         {
 
             return RoleManipulationLogic.GetRoles(request);
         }
+
+        // --- Insert
+        public object Post(RoleInsertRequest request)
+        {
+            return RoleManipulationLogic.InsertRole(request);
+        }
+
+        // --- Update
+        public object Post(RoleUpdateRequest request)
+        {
+            return RoleManipulationLogic.UpdateRole(request);
+        }
+
+        // --- Delete
+        public object Any(RoleDeleteRequest request)
+        {
+            return RoleManipulationLogic.DeleteRole(request);
+        }
+
     }
 }

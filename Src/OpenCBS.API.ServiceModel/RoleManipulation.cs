@@ -15,6 +15,22 @@ namespace OpenCBS.API.ServiceModel
         public bool? Deleted { get; set; }
     }
 
+    [Route("/roles/update")]
+    public class RoleUpdateRequest : RoleData
+    {
+    }
+
+    [Route("/roles/insert")]
+    public class RoleInsertRequest : RoleData
+    {
+    }
+
+    [Route("/roles/delete/{Id}")]
+    public class RoleDeleteRequest
+    {
+        public int Id { get; set; }
+    }
+
     public class RoleResponse
     {
         public List<RoleData> Roles { get; set; }

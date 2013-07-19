@@ -36,5 +36,50 @@ namespace OpenCBS.API.DAL
                 return db.Query<Role>(query, new {Id = id}).FirstOrDefault();
             }
         }
+
+        public static int InsertRole(Role role)
+        {
+            using (var db = DbFactory.OpenDbConnection())
+            {
+                string query = DALHelper.ReadQuery("Role.InsertRole.sql");
+                return db.SqlScalar<int>(query, new
+                {
+                    Code = role.Code,
+                    Deleted = role.Deleted,
+                    Description = role.Description,
+                    IsRoleOfLoan = role.IsRoleOfLoan,
+                    IsRoleOfSaving = role.IsRoleOfSaving,
+                    IsRoleOfTeller = role.IsRoleOfTeller
+                });
+            }
+        }
+
+        public static void UpdateRole(Role role)
+        {
+            using (var db = DbFactory.OpenDbConnection())
+            {
+                string query = DALHelper.ReadQuery("Role.UpdateRole.sql");
+                int result = db.SqlScalar<int>(query, new
+                {
+                    Id = role.Id,
+                    Code = role.Code,
+                    Deleted = role.Deleted,
+                    Description = role.Description,
+                    IsRoleOfLoan = role.IsRoleOfLoan,
+                    IsRoleOfSaving = role.IsRoleOfSaving,
+                    IsRoleOfTeller = role.IsRoleOfTeller
+                });
+            }
+        }
+
+        public static void DeleteRole(int id)
+        {
+            using (var db = DbFactory.OpenDbConnection())
+            {
+                string query = DALHelper.ReadQuery("Role.UpdateRole.sql");
+                int result = db.SqlScalar<int>(query, new{ Id = id});
+            }
+        }
+
     }
 }
