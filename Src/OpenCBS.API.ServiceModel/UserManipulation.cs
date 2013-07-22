@@ -7,7 +7,7 @@ using ServiceStack.ServiceInterface.ServiceModel;
 
 namespace OpenCBS.API.ServiceModel
 {
-    [Route("/userss/includedeleted/{Deleted}")]
+    [Route("/users/includedeleted/{Deleted}")]
     [Route("/users/{Id}")]
     public class UserRequest
     {
