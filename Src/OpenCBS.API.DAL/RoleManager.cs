@@ -8,13 +8,13 @@ namespace OpenCBS.API.DAL
 {
     public class RoleManager
     {
-        readonly static OrmLiteConnectionFactory DbFactory = DALHelper.GetOrmLiteConnectionFactory();
+        readonly static OrmLiteConnectionFactory _dbFactory = DALHelper.GetOrmLiteConnectionFactory();
 
         public static List<Role> GetAllRoles(bool isSelectDeletedToo)
         {
             //var dbFactory = DALHelper.GetOrmLiteConnectionFactory();
 
-            using (var db = DbFactory.OpenDbConnection())
+            using (var db = _dbFactory.OpenDbConnection())
             {
                 string query = DALHelper.ReadQuery("Role.GetAllRoles.sql");
 
@@ -27,7 +27,7 @@ namespace OpenCBS.API.DAL
 
         public static Role GetRoleById(int id)
         {
-            using (var db = DbFactory.OpenDbConnection())
+            using (var db = _dbFactory.OpenDbConnection())
             {
                 string query = DALHelper.ReadQuery("Role.GetAllRoles.sql");
                 query += " AND [id] = @Id";
@@ -39,7 +39,7 @@ namespace OpenCBS.API.DAL
 
         public static int InsertRole(Role role)
         {
-            using (var db = DbFactory.OpenDbConnection())
+            using (var db = _dbFactory.OpenDbConnection())
             {
                 string query = DALHelper.ReadQuery("Role.InsertRole.sql");
                 return db.SqlScalar<int>(query, new
@@ -56,7 +56,7 @@ namespace OpenCBS.API.DAL
 
         public static void UpdateRole(Role role)
         {
-            using (var db = DbFactory.OpenDbConnection())
+            using (var db = _dbFactory.OpenDbConnection())
             {
                 string query = DALHelper.ReadQuery("Role.UpdateRole.sql");
                 int result = db.SqlScalar<int>(query, new
@@ -74,7 +74,7 @@ namespace OpenCBS.API.DAL
 
         public static void DeleteRole(int id)
         {
-            using (var db = DbFactory.OpenDbConnection())
+            using (var db = _dbFactory.OpenDbConnection())
             {
                 string query = DALHelper.ReadQuery("Role.UpdateRole.sql");
                 int result = db.SqlScalar<int>(query, new{ Id = id});

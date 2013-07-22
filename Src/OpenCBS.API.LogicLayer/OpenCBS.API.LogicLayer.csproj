@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UserManipulationLogic.cs" />
     <Compile Include="RoleManipulationLogic.cs" />
     <Compile Include="UserAuthenticationLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

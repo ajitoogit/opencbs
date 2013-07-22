@@ -18,11 +18,11 @@ namespace OpenCBS.API.LogicLayer
         {
             try
             {
-                var roles = request.Id != default(int)
-                                       ? new List<Role>() {RoleManager.GetRoleById(request.Id)}
-                                       : (request.Deleted.HasValue
-                                              ? RoleManager.GetAllRoles((bool) request.Deleted)
-                                              : null);
+                var roles = request.Id > 0
+                                ? new List<Role>() {RoleManager.GetRoleById(request.Id)}
+                                : (request.Deleted.HasValue
+                                       ? RoleManager.GetAllRoles((bool) request.Deleted)
+                                       : null);
                 return ConvertRoleListToRoleResponse(roles);
             }
             catch (Exception ex)

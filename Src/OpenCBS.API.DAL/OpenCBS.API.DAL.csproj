@@ -95,6 +95,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Queries\Role\DeleteRole.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Queries\User\GetUsers.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Queries\User\InsertUser.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Queries\User\UpdateUser.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

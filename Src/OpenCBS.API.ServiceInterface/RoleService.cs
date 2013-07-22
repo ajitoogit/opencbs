@@ -11,7 +11,7 @@ namespace OpenCBS.API.ServiceInterface
     class RoleService: Service
     {
         // --- Get
-        public object Any(RoleRequest request)
+        public object Get(RoleRequest request)
         {
 
             return RoleManipulationLogic.GetRoles(request);
