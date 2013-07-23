@@ -17,14 +17,16 @@
 // Website: http://www.opencbs.com
 // Contact: contact@opencbs.com
 
-using System.Data.SqlClient;
+using System.Windows.Forms;
 using OpenCBS.CoreDomain.Clients;
+using OpenCBS.CoreDomain.Contracts.Guarantees;
 using OpenCBS.CoreDomain.Contracts.Loans;
+using OpenCBS.CoreDomain.Contracts.Savings;
 
 namespace OpenCBS.Extensions
 {
-    public interface IContractCodeGenerator
+    public interface ILoanDetailsButton
     {
-        string GenerateContractCode(IClient client, Loan loan, SqlTransaction transaction);
+        Button GetButton(IClient client, Loan loan, Guarantee guarantee, SavingBookContract savings);
     }
 }

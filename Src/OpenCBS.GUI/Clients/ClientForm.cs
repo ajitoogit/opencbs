@@ -113,6 +113,9 @@ namespace OpenCBS.GUI.Clients
         [ImportMany(typeof(ISavingsTabs), RequiredCreationPolicy = CreationPolicy.NonShared)]
         public List<ISavingsTabs> SavingsExtensions { get; set; }
 
+        [ImportMany(typeof(ILoanDetailsButton), RequiredCreationPolicy = CreationPolicy.NonShared)]
+        public List<ILoanDetailsButton> LoanDetailsButtons { get; set; }
+
         #endregion
 
         #region *** Constructors ***
@@ -246,6 +249,7 @@ namespace OpenCBS.GUI.Clients
             bool active = _credit != null && _credit.ContractStatus == OContractStatus.Active;
             InitializeCustomizableFields(OCustomizableFieldEntities.Loan, pContractId, active);
             LoadLoanDetailsExtensions();
+            LoadLoanDetailsButtons();
         }
 
         public ClientForm(IClient pClient, int pContractId, Form pMdiParent, string selectedTab)
@@ -272,6 +276,7 @@ namespace OpenCBS.GUI.Clients
             bool active = _credit != null && _credit.ContractStatus == OContractStatus.Active;
             InitializeCustomizableFields(OCustomizableFieldEntities.Loan, pContractId, active);
             LoadLoanDetailsExtensions();
+            LoadLoanDetailsButtons();
         }
         #endregion
 
@@ -1739,6 +1744,7 @@ namespace OpenCBS.GUI.Clients
 
             SetGuarantorsEnabled(_product.UseGuarantorCollateral);
             LoadLoanDetailsExtensions();
+            LoadLoanDetailsButtons();
         }
 
         private void ViewContract()
@@ -1798,6 +1804,7 @@ namespace OpenCBS.GUI.Clients
                             tabControlPerson.SelectedTab = tabPageCreditCommitee;
                         }
                         LoadLoanDetailsExtensions();
+                        LoadLoanDetailsButtons();
                     }
                     if (lvContracts.FocusedItem.Text == @"G")
                     {
@@ -1836,6 +1843,14 @@ namespace OpenCBS.GUI.Clients
             buttonLoanReschedule.Enabled = !pCredit.Closed;
             IsRescheduleAllowed(pCredit);
             buttonManualSchedule.Enabled = !pCredit.Closed;
+            try
+            {
+                ServiceProvider.GetContractServices().ManualScheduleAfterDisbursement();
+            }
+            catch (Exception)
+            {
+                buttonManualSchedule.Enabled = false;
+            }
             SetAddTrancheButton(pCredit);
             buttonLoanRepaymentRepay.Enabled = !pCredit.Closed;
             btnWriteOff.Enabled = !pCredit.Closed && !pCredit.WrittenOff;
@@ -2187,6 +2202,14 @@ namespace OpenCBS.GUI.Clients
 
             btnEditSchedule.Visible = _credit.Product.AllowFlexibleSchedule;
             btnEditSchedule.Enabled = ((_credit.ContractStatus == 0 || _credit.PendingOrPostponed()) && !_credit.Disbursed);
+            try
+            {
+                ServiceProvider.GetContractServices().ManualScheduleBeforeDisbursement();
+            }
+            catch (Exception)
+            {
+                btnEditSchedule.Enabled = false;
+            }
             EnableLocAmountTextBox(_credit);
             EnableInsuranceTextBox(_credit);
             InitializeTabPageAdvancedSettings();
@@ -6108,29 +6131,30 @@ namespace OpenCBS.GUI.Clients
         private void btnEditSchedule_Click(object sender, EventArgs e)
         {
             if (null == _credit || 0 == _credit.InstallmentList.Count) return;
-            Loan loan = _credit.Copy();
-            EditContractSchedule editContractSchedule = new EditContractSchedule(ref loan);
-
-            if (editContractSchedule.ShowDialog() == DialogResult.OK)
+            try
             {
-                try
+                ServiceProvider.GetContractServices().ManualScheduleBeforeDisbursement();
+                ManualScheduleForm manualScheduleForm = new ManualScheduleForm(_credit.Copy());
+
+                if (manualScheduleForm.ShowDialog() == DialogResult.OK)
                 {
-                    ServicesProvider.GetInstance().GetContractServices().CanUserEditRepaymentSchedule();
+
                     _credit.ScheduleChangedManually = true;
 
                     if (_credit.ContractStatus != 0)
                         ServicesProvider.GetInstance().GetContractServices().SaveSchedule(
-                            editContractSchedule.Installments, _credit);
+                            manualScheduleForm.Loan.InstallmentList, _credit);
 
-                    _credit.InstallmentList = editContractSchedule.Installments;
+                    _credit.InstallmentList = manualScheduleForm.Loan.InstallmentList;
 
                     DisplayInstallments(ref _credit);
                 }
-                catch (Exception ex)
-                {
-                    new frmShowError(CustomExceptionHandler.ShowExceptionText(ex)).ShowDialog();
-                }
             }
+            catch (Exception ex)
+            {
+                new frmShowError(CustomExceptionHandler.ShowExceptionText(ex)).ShowDialog();
+            }
+
         }
 
         private void textBoxLocAmount_Leave(object sender, EventArgs e)
@@ -7003,6 +7027,19 @@ namespace OpenCBS.GUI.Clients
             }
         }
 
+        private void LoadLoanDetailsButtons()
+        {
+            foreach (var loanDetailsButton in LoanDetailsButtons)
+            {
+                var button = loanDetailsButton.GetButton(_client, _credit, _guarantee, _saving);
+                if (button == null) continue;
+                // Remove button if exists
+                var controls = loanDetailsButtonsPanel.Controls.Find(button.Name, false);
+                if (controls.Any()) loanDetailsButtonsPanel.Controls.Remove(controls[0]);
+                loanDetailsButtonsPanel.Controls.Add(button);
+            }
+        }
+
         private void buttonSavingsOperations_Click(object sender, EventArgs e)
         {
             var point = buttonSavingsOperations.PointToScreen(this.buttonSavingsOperations.Location);
@@ -7014,12 +7051,14 @@ namespace OpenCBS.GUI.Clients
         private void buttonManualSchedule_Click(object sender, EventArgs e)
         {
             if (null == _credit || 0 == _credit.InstallmentList.Count) return;
-            ManualScheduleForm manualScheduleForm = new ManualScheduleForm(_credit.Copy());
-
-            if (manualScheduleForm.ShowDialog() == DialogResult.OK)
+            try
             {
-                try
+                ServiceProvider.GetContractServices().ManualScheduleAfterDisbursement();
+                ManualScheduleForm manualScheduleForm = new ManualScheduleForm(_credit.Copy());
+
+                if (manualScheduleForm.ShowDialog() == DialogResult.OK)
                 {
+
 
                     var manualScheduleChangeEvent = new ManualScheduleChangeEvent();
                     manualScheduleChangeEvent.User = User.CurrentUser;
@@ -7028,17 +7067,18 @@ namespace OpenCBS.GUI.Clients
                                    .AddManualScheduleChangeEvent(_credit, manualScheduleChangeEvent);
 
                     _credit = manualScheduleForm.Loan;
-                    
+
                     SaveContract();
                     _credit = ServiceProvider.GetContractServices().SelectLoan(_credit.Id, true, true, true);
                     DisplayListViewLoanRepayments(_credit);
                     DisplayLoanEvents(_credit);
                 }
-                catch (Exception ex)
-                {
-                    new frmShowError(CustomExceptionHandler.ShowExceptionText(ex)).ShowDialog();
-                }
             }
+            catch (Exception ex)
+            {
+                new frmShowError(CustomExceptionHandler.ShowExceptionText(ex)).ShowDialog();
+            }
+
         }
     }
 }

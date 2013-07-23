@@ -45,9 +45,6 @@ using OpenCBS.Shared.Settings;
 
 namespace OpenCBS.CoreDomain.Contracts.Loans
 {
-    /// <summary>
-    /// Description r�sum�e de CreditContract
-    /// </summary>
     [Serializable]
     public class Loan : IContract, IDisposable
     {
@@ -1675,7 +1672,8 @@ namespace OpenCBS.CoreDomain.Contracts.Loans
                     installment.IsPending = pending;
                 }
 
-                installment.OLB = CalculateExpectedOlb(installment.Number, keepExpectedInstallment);
+                if (!keepExpectedInstallment && (paymentType == OPaymentType.PartialPayment || paymentType == OPaymentType.TotalPayment))
+                    installment.OLB = CalculateExpectedOlb(installment.Number, keepExpectedInstallment);
             }
             EscapedMember = null;
             return rPe;

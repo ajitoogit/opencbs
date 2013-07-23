@@ -58,7 +58,8 @@ namespace OpenCBS.Reports
 
         private static string GetReportsDir()
         {
-            string dir = AppDomain.CurrentDomain.BaseDirectory;
+            string dir = TechnicalSettings.ReportPath;
+            if (string.IsNullOrEmpty(dir)) dir = AppDomain.CurrentDomain.BaseDirectory;
             return Path.Combine(dir, "Reports");
         }
 
@@ -86,6 +87,10 @@ namespace OpenCBS.Reports
             string dirConsolidated = Path.Combine(dir, "Consolidated");
             string dirMain = GetReportsDir();
 
+            if (!Directory.Exists(dirStandard))
+                Directory.CreateDirectory(dirStandard);
+            if (!Directory.Exists(dirInternal))
+                Directory.CreateDirectory(dirInternal);
             if (!Directory.Exists(dirConsolidated))
                 Directory.CreateDirectory(dirConsolidated);
 
