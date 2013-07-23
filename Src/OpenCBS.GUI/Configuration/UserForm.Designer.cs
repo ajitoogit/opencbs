@@ -54,14 +54,14 @@ namespace OpenCBS.GUI.Configuration
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserForm));
             this.lvUsers = new System.Windows.Forms.ListView();
-            this.colUsername = new System.Windows.Forms.ColumnHeader();
-            this.colRole = new System.Windows.Forms.ColumnHeader();
-            this.colFirstname = new System.Windows.Forms.ColumnHeader();
-            this.colLastname = new System.Windows.Forms.ColumnHeader();
-            this.cHMail = new System.Windows.Forms.ColumnHeader();
-            this.colSex = new System.Windows.Forms.ColumnHeader();
-            this.colSubordinates = new System.Windows.Forms.ColumnHeader();
-            this.colPhone = new System.Windows.Forms.ColumnHeader();
+            this.colUsername = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colRole = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colFirstname = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colLastname = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cHMail = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colSex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colSubordinates = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colPhone = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabButtons = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnNew = new System.Windows.Forms.Button();
@@ -88,9 +88,11 @@ namespace OpenCBS.GUI.Configuration
             this.cmbSex = new System.Windows.Forms.ComboBox();
             this.lblPhone = new System.Windows.Forms.Label();
             this.txbPhone = new System.Windows.Forms.TextBox();
+            this.dataSetElementaryMvts1 = new OpenCBS.CoreDomain.DataSet.DataSetElementaryMvts();
             this.flowLayoutPanel1.SuspendLayout();
             this.gbAddUser.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataSetElementaryMvts1)).BeginInit();
             this.SuspendLayout();
             // 
             // lvUsers
@@ -113,8 +115,8 @@ namespace OpenCBS.GUI.Configuration
             this.lvUsers.UseCompatibleStateImageBehavior = false;
             this.lvUsers.View = System.Windows.Forms.View.Details;
             this.lvUsers.SelectedIndexChanged += new System.EventHandler(this.OnSelectedUserChanged);
-            this.lvUsers.DoubleClick += new System.EventHandler(this.OnSubordinatesClicked);
             this.lvUsers.Click += new System.EventHandler(this.listViewUsers_Click);
+            this.lvUsers.DoubleClick += new System.EventHandler(this.OnSubordinatesClicked);
             // 
             // colUsername
             // 
@@ -187,9 +189,9 @@ namespace OpenCBS.GUI.Configuration
             this.btnDelete.Click += new System.EventHandler(this.OnDeleteClick);
             // 
             // gbAddUser
-            //
-            resources.ApplyResources(this.gbAddUser, "gbAddUser");
+            // 
             this.gbAddUser.Controls.Add(this.tableLayoutPanel);
+            resources.ApplyResources(this.gbAddUser, "gbAddUser");
             this.gbAddUser.Name = "gbAddUser";
             this.gbAddUser.TabStop = false;
             // 
@@ -250,7 +252,7 @@ namespace OpenCBS.GUI.Configuration
             this.txbUsername.TextChanged += new System.EventHandler(this.textBoxUsername_TextChanged);
             // 
             // lbComfirmPassword
-            //
+            // 
             resources.ApplyResources(this.lbComfirmPassword, "lbComfirmPassword");
             this.lbComfirmPassword.Name = "lbComfirmPassword";
             // 
@@ -331,8 +333,13 @@ namespace OpenCBS.GUI.Configuration
             this.txbPhone.Name = "txbPhone";
             this.txbPhone.TextChanged += new System.EventHandler(this.txbPhone_TextChanged);
             // 
+            // dataSetElementaryMvts1
+            // 
+            this.dataSetElementaryMvts1.DataSetName = "DataSetElementaryMvts";
+            this.dataSetElementaryMvts1.Locale = new System.Globalization.CultureInfo("fr-FR");
+            // 
             // UserForm
-            //
+            // 
             resources.ApplyResources(this, "$this");
             this.Controls.Add(this.lvUsers);
             this.Controls.Add(this.flowLayoutPanel1);
@@ -349,6 +356,7 @@ namespace OpenCBS.GUI.Configuration
             this.gbAddUser.ResumeLayout(false);
             this.tableLayoutPanel.ResumeLayout(false);
             this.tableLayoutPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataSetElementaryMvts1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -370,5 +378,6 @@ namespace OpenCBS.GUI.Configuration
         private ColumnHeader colPhone;
         private Label lblPhone;
         private TextBox txbPhone;
+        private CoreDomain.DataSet.DataSetElementaryMvts dataSetElementaryMvts1;
     }
 }
