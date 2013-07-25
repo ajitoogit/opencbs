@@ -43,7 +43,10 @@ namespace OpenCBS.API.DAL
             using (var db = _dbFactory.OpenDbConnection())
             {
                 string query = DALHelper.ReadQuery("User.GetUsers.sql");
-                var users = db.Query<User>(query + " AND [deleted] = @Include", new { Include = isIncludeDeleted});
+                if (!isIncludeDeleted)
+                    query += " AND [deleted] = 0";
+
+                var users = db.Query<User>(query);
                 return users;
             }
         }
