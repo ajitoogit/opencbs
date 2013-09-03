@@ -38,15 +38,35 @@ using OpenCBS.CoreDomain.Events.Saving;
 using OpenCBS.CoreDomain.FundingLines;
 using OpenCBS.CoreDomain.Products;
 using OpenCBS.Enums;
-using OpenCBS.ExceptionsHandler;
 using OpenCBS.Shared;
 using OpenCBS.Shared.Settings;
 
 namespace OpenCBS.CoreDomain.Contracts.Loans
 {
+    public interface IRepaymentStrategy
+    {
+        IEnumerable<Func<decimal, decimal>> GetRepaymentIterator(Loan loan, DateTime date);
+    }
+
     [Serializable]
     public class Loan : IContract, IDisposable
     {
+        private class DefaultRepaymentStrategy : IRepaymentStrategy
+        {
+            public IEnumerable<Func<decimal, decimal>> GetRepaymentIterator(Loan loan, DateTime date)
+            {
+                var installments = from i in loan.InstallmentList
+                                   where !i.IsRepaid && i.ExpectedDate.Date <= date.Date
+                                   select i;
+                foreach (var installment in installments)
+                {
+                    var temp = installment;
+                    yield return arg => loan.RepayInterest(temp, arg);
+                    yield return arg => loan.RepayPrincipal(temp, arg);
+                }
+            }
+        }
+
         public static OCurrency InitialOlbOfContractBeforeRescheduling;
         private string _branchCode;
         private DateTime _startDate;
@@ -2916,6 +2936,42 @@ namespace OpenCBS.CoreDomain.Contracts.Loans
 
             Events.Add(loanCloseEvent);
             return loanCloseEvent;
+        }
+
+        public decimal RepayInterest(Installment installment, decimal amount)
+        {
+            if (amount == 0) return 0;
+            if (installment.InterestHasToPay > amount)
+            {
+                installment.PaidInterests += amount;
+                return 0;
+            }
+            amount -= installment.InterestHasToPay.Value;
+            installment.PaidInterests += installment.InterestHasToPay;
+            return amount;
+        }
+
+        public decimal RepayPrincipal(Installment installment, decimal amount)
+        {
+            if (amount == 0) return 0;
+            if (installment.PrincipalHasToPay > amount)
+            {
+                installment.PaidCapital += amount;
+                return 0;
+            }
+            amount -= installment.PrincipalHasToPay.Value;
+            installment.PaidCapital += installment.PrincipalHasToPay;
+            return amount;
+        }
+
+        public void RepayNew(DateTime date, decimal amount)
+        {
+            var repaymentStrategry = new DefaultRepaymentStrategy();
+            foreach (var repaymentMethod in repaymentStrategry.GetRepaymentIterator(this, new DateTime(2100, 1, 1)))
+            {
+                if (amount == 0) return;
+                amount = repaymentMethod(amount);
+            }
         }
     }
 }
