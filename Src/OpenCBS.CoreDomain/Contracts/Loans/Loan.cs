@@ -45,7 +45,8 @@ namespace OpenCBS.CoreDomain.Contracts.Loans
 {
     public interface IRepaymentStrategy
     {
-        IEnumerable<Func<decimal, decimal>> GetRepaymentIterator(Loan loan, DateTime date);
+        IEnumerable<Func<decimal, decimal>> GetIterator(Loan loan, DateTime date, bool skipInterest);
+        IEnumerable<Func<decimal, decimal>> GetInterestIterator(Loan loan, DateTime date);
     }
 
     [Serializable]
@@ -53,7 +54,7 @@ namespace OpenCBS.CoreDomain.Contracts.Loans
     {
         private class DefaultRepaymentStrategy : IRepaymentStrategy
         {
-            public IEnumerable<Func<decimal, decimal>> GetRepaymentIterator(Loan loan, DateTime date)
+            public IEnumerable<Func<decimal, decimal>> GetIterator(Loan loan, DateTime date, bool skipInterest)
             {
                 var installments = from i in loan.InstallmentList
                                    where !i.IsRepaid && i.ExpectedDate.Date <= date.Date
@@ -61,8 +62,22 @@ namespace OpenCBS.CoreDomain.Contracts.Loans
                 foreach (var installment in installments)
                 {
                     var temp = installment;
-                    yield return arg => loan.RepayInterest(temp, arg);
+                    yield return arg => loan.RepayPenalty(temp, arg);
+                    if (!skipInterest)
+                        yield return arg => loan.RepayInterest(temp, arg);
                     yield return arg => loan.RepayPrincipal(temp, arg);
+                }
+            }
+
+            public IEnumerable<Func<decimal, decimal>> GetInterestIterator(Loan loan, DateTime date)
+            {
+                var installments = from i in loan.InstallmentList
+                                   where !i.IsRepaid && i.ExpectedDate <= date.Date
+                                   select i;
+                foreach (var installment in installments)
+                {
+                    var temp = installment;
+                    yield return arg => loan.RepayInterest(temp, arg);
                 }
             }
         }
@@ -2938,6 +2953,19 @@ namespace OpenCBS.CoreDomain.Contracts.Loans
             return loanCloseEvent;
         }
 
+        public decimal RepayPenalty(Installment installment, decimal amount)
+        {
+            if (amount == 0) return 0;
+            if (installment.PenaltyDue > amount)
+            {
+                installment.PaidPenalty += amount;
+                return 0;
+            }
+            amount -= installment.PenaltyDue;
+            installment.PaidPenalty += installment.PenaltyDue;
+            return amount;
+        }
+
         public decimal RepayInterest(Installment installment, decimal amount)
         {
             if (amount == 0) return 0;
@@ -2964,14 +2992,47 @@ namespace OpenCBS.CoreDomain.Contracts.Loans
             return amount;
         }
 
-        public void RepayNew(DateTime date, decimal amount)
+        private decimal GetPenaltyDue(DateTime date)
         {
-            var repaymentStrategry = new DefaultRepaymentStrategy();
-            foreach (var repaymentMethod in repaymentStrategry.GetRepaymentIterator(this, new DateTime(2100, 1, 1)))
+            var accruedPenalty = (
+                                     from accrual in Events.GetLoanPenaltyAccrualEvents()
+                                     where !accrual.Deleted && accrual.Date.Date <= date.Date
+                                     select accrual
+                                 ).Sum(a => a.Penalty.Value);
+            var paidPenalty = (
+                                  from repayment in Events.GetRepaymentEvents()
+                                  where !repayment.Deleted && repayment.Date.Date <= date.Date
+                                  select repayment
+                              ).Sum(r => r.Penalties.Value);
+            return paidPenalty > accruedPenalty ? 0 : accruedPenalty - paidPenalty;
+        }
+
+        public void RepayNew(DateTime date, decimal amount, bool overrideInterest, decimal interest)
+        {
+            var firstUnpaidInstallment = GetFirstUnpaidInstallment();
+            firstUnpaidInstallment.AccruedPenalty += GetPenaltyDue(date);
+
+            amount = overrideInterest ? amount - interest : amount;
+            var repaymentStrategy = new DefaultRepaymentStrategy();
+            if (overrideInterest)
+            {
+                foreach (var repaymentMethod in repaymentStrategy.GetInterestIterator(this, new DateTime(2100, 1, 1)))
+                {
+                    if (interest == 0) break;
+                    interest = repaymentMethod(interest);
+                }
+            }
+
+            foreach (var repaymentMethod in repaymentStrategy.GetIterator(this, new DateTime(2100, 1, 1), overrideInterest))
             {
                 if (amount == 0) return;
                 amount = repaymentMethod(amount);
             }
+        }
+
+        public void RepayNew(DateTime date, decimal amount)
+        {
+            RepayNew(date, amount, false, 0);
         }
     }
 }

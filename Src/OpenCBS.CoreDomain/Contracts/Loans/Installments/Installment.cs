@@ -41,13 +41,13 @@ namespace OpenCBS.CoreDomain.Contracts.Loans.Installments
         private OCurrency _unpaidCommision = 0;
         private OCurrency _olbAfterRepayment = 0;
         private bool _pending;
-        
+
         public Installment()
         {
             CalculatedPenalty = 0m;
             IsLastToRepay = false;
         }
-        public Installment(DateTime expectedDate,OCurrency interestRepayment,OCurrency capitalRepayment,
+        public Installment(DateTime expectedDate, OCurrency interestRepayment, OCurrency capitalRepayment,
                            OCurrency paidCapital, OCurrency paidInterests, OCurrency paidFees, DateTime? paidDate, int number)
         {
             ExpectedDate = expectedDate;
@@ -78,8 +78,8 @@ namespace OpenCBS.CoreDomain.Contracts.Loans.Installments
 
         public OCurrency InterestsRepayment
         {
-            get{ return _interestsRepayment;}
-            set{_interestsRepayment = value;}
+            get { return _interestsRepayment; }
+            set { _interestsRepayment = value; }
         }
 
         public OCurrency PaidFees
@@ -102,20 +102,20 @@ namespace OpenCBS.CoreDomain.Contracts.Loans.Installments
 
         public OCurrency CapitalRepayment
         {
-            get{return _capitalRepayment;}
-            set{_capitalRepayment = value;}
+            get { return _capitalRepayment; }
+            set { _capitalRepayment = value; }
         }
 
-        public OCurrency   PaidCapital
+        public OCurrency PaidCapital
         {
-            get{return _paidCapital;}
-            set{_paidCapital = value;}
+            get { return _paidCapital; }
+            set { _paidCapital = value; }
         }
 
-        public OCurrency   PaidInterests
+        public OCurrency PaidInterests
         {
-            get{return _paidInterests;}
-            set{_paidInterests = value;}
+            get { return _paidInterests; }
+            set { _paidInterests = value; }
         }
 
         public DateTime? PaidDate { get; set; }
@@ -126,32 +126,34 @@ namespace OpenCBS.CoreDomain.Contracts.Loans.Installments
         {
             get
             {
-                return  _interestsRepayment + _capitalRepayment;
+                return _interestsRepayment + _capitalRepayment;
             }
         }
 
-        public OCurrency   AmountHasToPayWithInterest
+        public OCurrency AmountHasToPayWithInterest
         {
-            get 
-            { 
+            get
+            {
                 return AmountComparer.Compare(_interestsRepayment + _capitalRepayment - _paidCapital - _paidInterests, 0) == 0
                            ? 0
                            : _interestsRepayment + _capitalRepayment - _paidCapital - _paidInterests;
             }
         }
 
-        public OCurrency   PrincipalHasToPay
+        public OCurrency PrincipalHasToPay
         {
-            get {
+            get
+            {
                 return AmountComparer.Compare(_capitalRepayment - _paidCapital, 0) == 0
                            ? 0
                            : _capitalRepayment - _paidCapital;
             }
         }
 
-        public OCurrency   InterestHasToPay
+        public OCurrency InterestHasToPay
         {
-            get {
+            get
+            {
                 return AmountComparer.Compare(_interestsRepayment - _paidInterests, 0) == 0
                            ? 0
                            : _interestsRepayment - _paidInterests;
@@ -166,7 +168,7 @@ namespace OpenCBS.CoreDomain.Contracts.Loans.Installments
         public OCurrency Proportion { get; set; }
         public OCurrency OLBAfterRepayment
         {
-            get{return OLB - CapitalRepayment;}
+            get { return OLB - CapitalRepayment; }
         }
 
         /// <summary>
@@ -178,7 +180,10 @@ namespace OpenCBS.CoreDomain.Contracts.Loans.Installments
         {
             get
             {
-                return AmountComparer.Equals(_interestsRepayment, _paidInterests) && AmountComparer.Equals(Math.Round(_capitalRepayment.Value, 2, MidpointRounding.AwayFromZero), _paidCapital) ? true : false;
+                //return AmountComparer.Equals(_interestsRepayment, _paidInterests) && AmountComparer.Equals(Math.Round(_capitalRepayment.Value, 2, MidpointRounding.AwayFromZero), _paidCapital) ? true : false;
+                return InterestsRepayment == PaidInterests
+                    && CapitalRepayment == PaidCapital
+                    && AccruedPenalty == PaidPenalty + CancelledPenalty;
             }
         }
 
@@ -214,5 +219,13 @@ namespace OpenCBS.CoreDomain.Contracts.Loans.Installments
 
         public OCurrency CalculatedPenalty { get; set; }
         public bool IsLastToRepay { get; set; }
+
+        public decimal AccruedPenalty { get; set; }
+        public decimal PaidPenalty { get; set; }
+        public decimal CancelledPenalty { get; set; }
+        public decimal PenaltyDue
+        {
+            get { return AccruedPenalty - PaidPenalty - CancelledPenalty; }
+        }
     }
 }

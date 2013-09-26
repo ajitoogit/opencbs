@@ -29,5 +29,11 @@ namespace OpenCBS.Engine
         {
             get { return Principal == PaidPrincipal && Interest == PaidInterest; }
         }
+
+        public decimal Penalty { get; set; }
+
+        public decimal PaidPenalty { get; set; }
+
+        public decimal CancelledPenalty { get; set; }
     }
 }

@@ -315,6 +315,14 @@ namespace OpenCBS.CoreDomain.Events
             return eventList;
         }
 
+        public IEnumerable<LoanPenaltyAccrualEvent> GetLoanPenaltyAccrualEvents()
+        {
+            return from e in _list
+                   where e is LoanPenaltyAccrualEvent
+                   orderby e.Id
+                   select e as LoanPenaltyAccrualEvent;
+        }
+
         public bool IsLastEvent(Event e)
         {
             for (int i = _list.Count - 1; i >= 0; i--)
