@@ -173,26 +173,32 @@ namespace OpenCBS.GUI
                 .ForMember(dest => dest.PaidPrincipal, opt => opt.MapFrom(src => src.PaidCapital.Value))
                 .ForMember(dest => dest.PaidInterest, opt => opt.MapFrom(src => src.PaidInterests.Value))
                 .ForMember(dest => dest.Olb, opt => opt.MapFrom(src => src.OLB.Value))
-                .ForMember(dest => dest.LastPaymentDate, opt => opt.MapFrom(src => src.PaidDate));
+                .ForMember(dest => dest.LastPaymentDate, opt => opt.MapFrom(src => src.PaidDate))
+                .ForMember(dest => dest.Penalty, opt => opt.MapFrom(src => src.AccruedPenalty))
+                .ForMember(dest => dest.PaidPenalty, opt => opt.MapFrom(src => src.PaidPenalty))
+                .ForMember(dest => dest.CancelledPenalty, opt => opt.MapFrom(src => src.CancelledPenalty));
             Mapper
                 .CreateMap<Engine.Interfaces.IInstallment, CoreDomain.Contracts.Loans.Installments.Installment>()
                 .ForMember(dest => dest.ExpectedDate, opt => opt.MapFrom(src => src.RepaymentDate))
-                .ForMember(dest => dest.CapitalRepayment, opt => opt.MapFrom(src => (OCurrency)src.Principal))
-                .ForMember(dest => dest.InterestsRepayment, opt => opt.MapFrom(src => (OCurrency)src.Interest))
-                .ForMember(dest => dest.PaidCapital, opt => opt.MapFrom(src => (OCurrency)src.PaidPrincipal))
-                .ForMember(dest => dest.PaidInterests, opt => opt.MapFrom(src => (OCurrency)src.PaidInterest))
-                .ForMember(dest => dest.OLB, opt => opt.MapFrom(src => (OCurrency)src.Olb))
-                .ForMember(dest => dest.FeesUnpaid, opt => opt.UseValue((OCurrency)0))
+                .ForMember(dest => dest.CapitalRepayment, opt => opt.MapFrom(src => (OCurrency) src.Principal))
+                .ForMember(dest => dest.InterestsRepayment, opt => opt.MapFrom(src => (OCurrency) src.Interest))
+                .ForMember(dest => dest.PaidCapital, opt => opt.MapFrom(src => (OCurrency) src.PaidPrincipal))
+                .ForMember(dest => dest.PaidInterests, opt => opt.MapFrom(src => (OCurrency) src.PaidInterest))
+                .ForMember(dest => dest.OLB, opt => opt.MapFrom(src => (OCurrency) src.Olb))
+                .ForMember(dest => dest.FeesUnpaid, opt => opt.UseValue((OCurrency) 0))
                 .ForMember(dest => dest.NotPaidYet, opt => opt.UseValue(true))
                 .ForMember(dest => dest.Comment, opt => opt.UseValue(string.Empty))
                 .ForMember(dest => dest.IsPending, opt => opt.UseValue(false))
-                .ForMember(dest => dest.PaidFees, opt => opt.UseValue((OCurrency)0))
-                .ForMember(dest => dest.PaidCommissions, opt => opt.UseValue((OCurrency)0))
-                .ForMember(dest => dest.CommissionsUnpaid, opt => opt.UseValue((OCurrency)0))
+                .ForMember(dest => dest.PaidFees, opt => opt.UseValue((OCurrency) 0))
+                .ForMember(dest => dest.PaidCommissions, opt => opt.UseValue((OCurrency) 0))
+                .ForMember(dest => dest.CommissionsUnpaid, opt => opt.UseValue((OCurrency) 0))
                 .ForMember(dest => dest.PaidDate, opt => opt.MapFrom(src => src.LastPaymentDate))
-                .ForMember(dest => dest.Proportion, opt => opt.UseValue((OCurrency)0))
-                .ForMember(dest => dest.CalculatedPenalty, opt => opt.UseValue((OCurrency)0))
-                .ForMember(dest => dest.IsLastToRepay, opt => opt.UseValue(false));
+                .ForMember(dest => dest.Proportion, opt => opt.UseValue((OCurrency) 0))
+                .ForMember(dest => dest.CalculatedPenalty, opt => opt.UseValue((OCurrency) 0))
+                .ForMember(dest => dest.IsLastToRepay, opt => opt.UseValue(false))
+                .ForMember(dest => dest.AccruedPenalty, opt => opt.MapFrom(src => src.Penalty))
+                .ForMember(dest => dest.PaidPenalty, opt => opt.MapFrom(src => src.PaidPenalty))
+                .ForMember(dest => dest.CancelledPenalty, opt => opt.MapFrom(src => src.CancelledPenalty));
 
             Mapper.AssertConfigurationIsValid();
         }

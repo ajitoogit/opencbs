@@ -3034,5 +3034,14 @@ namespace OpenCBS.CoreDomain.Contracts.Loans
         {
             RepayNew(date, amount, false, 0);
         }
+
+        private void AddRepaymentEvents(List<Installment> oldSchedule, List<Installment> newSchedule, DateTime date)
+        {
+            var count = newSchedule.Count;
+            for (var i = 0; i < count; i++)
+            {
+                
+            }
+        }
     }
 }
